@@ -1,0 +1,48 @@
+<?php
+header("Access-Control-Allow-Origin: http://localhost:5173");
+header("Access-Control-Allow-Credentials: true");
+header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
+header('Content-Type: application/json');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
+    exit();
+}
+
+session_start();
+require_once 'authenticate.php';
+
+require_once 'connect_db.php';
+
+$input = json_decode(file_get_contents("php://input"), true);
+
+if (!$input) {
+    echo json_encode(["success" => false, "error" => "Invalid JSON"]);
+    exit();
+}
+
+$customerId = $input['customerId'] ?? null;
+
+if (!$customerId) {
+    echo json_encode(["success" => false, "error" => "Missing customer ID"]);
+    exit();
+}
+
+try {
+    $stmt = $pdo->prepare("SELECT * FROM orders WHERE customer_id = :customer_id AND deleted_at IS NULL");
+    $stmt->bindParam(":customer_id", $customerId, PDO::PARAM_INT);
+    $stmt->execute();
+
+    $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    echo json_encode(["success" => true, "data" => $orders]);
+} catch (PDOException $e) {
+    echo json_encode(["success" => false, "error" => $e->getMessage()]);
+}
