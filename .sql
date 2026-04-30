@@ -44,6 +44,7 @@ CREATE TABLE orders (
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     pickup_date DATETIME,
     status ENUM('pending', 'in_progress', 'ready', 'claimed', 'cancelled') DEFAULT 'pending',
+    order_amount DECIMAL(10,2) NOT NULL,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
