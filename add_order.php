@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-session_start();
 require_once 'authenticate.php';
 
 require_once 'connect_db.php';
@@ -30,6 +29,7 @@ if (!$input) {
 
 $customerId = $input['customerId'] ?? null;
 $dueDate = $input['dueDate'] ?? null;
+$orderAmount = $input['totalAmount'] ?? 0;
 $garments = $input['garments'] ?? [];
 
 if (!$customerId || !$dueDate || !$garments) {
@@ -37,24 +37,23 @@ if (!$customerId || !$dueDate || !$garments) {
     exit();
 }
 
-$stmt = $pdo->prepare("INSERT INTO orders (customer_id, pickup_date) VALUES (:customer_id, :pickup_date)");
-$stmt->bindParam(":customer_id", $customerId, PDO::PARAM_INT);
-$stmt->bindParam(":pickup_date", $dueDate);
-$stmt->execute();
-
-$orderId = $pdo->lastInsertId();
-
 try {
+    $stmt = $pdo->prepare("INSERT INTO orders (customer_id, pickup_date, order_amount) VALUES (:customer_id, :pickup_date, :order_amount)");
+    $stmt->bindParam(":customer_id", $customerId, PDO::PARAM_INT);
+    $stmt->bindParam(":pickup_date", $dueDate);
+    $stmt->bindParam(":order_amount", $orderAmount);
+    $stmt->execute();
+
+    $orderId = $pdo->lastInsertId();
+
     foreach ($garments as $garment) {
-        if ($garment["customer_id"] == $customerId) {
-            $stmt = $pdo->prepare("INSERT INTO garments (order_id, type, service, quantity, unit_price) VALUES (:order_id, :type, :service, :quantity, :unit_price)");
-            $stmt->bindParam(":order_id", $orderId, PDO::PARAM_INT);
-            $stmt->bindParam(":type", $garment["type"]);
-            $stmt->bindParam(":service", $garment["service"]);
-            $stmt->bindParam(":quantity", $garment["quantity"]);
-            $stmt->bindParam(":unit_price", $garment["unit_price"]);
-            $stmt->execute();
-        }
+        $stmt = $pdo->prepare("INSERT INTO garments (order_id, type, service, quantity, unit_price) VALUES (:order_id, :type, :service, :quantity, :unit_price)");
+        $stmt->bindParam(":order_id", $orderId, PDO::PARAM_INT);
+        $stmt->bindParam(":type", $garment["type"]);
+        $stmt->bindParam(":service", $garment["service"]);
+        $stmt->bindParam(":quantity", $garment["quantity"]);
+        $stmt->bindParam(":unit_price", $garment["unit_price"]);
+        $stmt->execute();
     }
     echo json_encode(["success" => true, "message" => "Order added successfully"]);
 } catch (PDOException $e) {
