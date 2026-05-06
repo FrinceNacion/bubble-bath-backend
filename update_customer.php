@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-session_start();
 require_once 'authenticate.php';
 
 require_once 'connect_db.php';
