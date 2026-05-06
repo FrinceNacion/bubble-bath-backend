@@ -35,7 +35,7 @@ if (!$limit) {
 }
 
 try {
-    $stmt = $pdo->prepare("SELECT order.*, customers.name AS customer FROM orders JOIN customers ON orders.customer_id = customers.customer_id WHERE orders.deleted_at IS NULL ORDER BY orders.order_date DESC LIMIT :limit");
+    $stmt = $pdo->prepare("SELECT orders.*, customers.name AS customer FROM orders JOIN customers ON orders.customer_id = customers.customer_id WHERE orders.deleted_at IS NULL ORDER BY orders.order_date DESC LIMIT :limit");
     $stmt->bindParam(":limit", $limit, PDO::PARAM_INT);
     $stmt->execute();
 
