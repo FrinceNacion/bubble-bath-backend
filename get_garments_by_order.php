@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-session_start();
 require_once 'authenticate.php';
 
 require_once 'connect_db.php';
@@ -30,8 +29,8 @@ if (!$input) {
 
 $orderId = $input['order_id'] ?? null;
 
-if (!$customerId) {
-    echo json_encode(["success" => false, "error" => "Missing customer ID"]);
+if (!$orderId) {
+    echo json_encode(["success" => false, "error" => "Missing order ID"]);
     exit();
 }
 
