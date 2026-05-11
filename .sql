@@ -76,22 +76,34 @@ CREATE TABLE garments (
 );
 
 -- =========================
--- transactions
+-- billings
 -- =========================
-CREATE TABLE transactions (
-    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT,
+CREATE TABLE billings (
+    billing_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    subtotal DECIMAL(10,2) NOT NULL,
+    discount_amount DECIMAL(10,2) DEFAULT 0.00,
+    additional_fees DECIMAL(10,2) DEFAULT 0.00,
     total_amount DECIMAL(10,2) NOT NULL,
-    amount_paid DECIMAL(10,2) DEFAULT 0.00,
-    payment_method VARCHAR(50),
-    payment_status ENUM('unpaid', 'partial', 'paid') DEFAULT 'unpaid',
-    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('unpaid', 'partially_paid', 'paid', 'void') DEFAULT 'unpaid',
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     deleted_at TIMESTAMP NULL,
 
-    FOREIGN KEY (order_id) REFERENCES orders(order_id)
-        ON DELETE CASCADE
-        ON UPDATE CASCADE
+    FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE
+);
+
+-- =========================
+-- payments
+-- =========================
+CREATE TABLE payments (
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    billing_id INT NOT NULL,
+    amount_paid DECIMAL(10,2) NOT NULL,
+    payment_method ENUM('cash', 'e-wallet', 'card') NOT NULL,
+    payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    notes TEXT,
+    
+    FOREIGN KEY (billing_id) REFERENCES billings(billing_id) ON DELETE CASCADE
 );

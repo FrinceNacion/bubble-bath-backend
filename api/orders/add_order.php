@@ -46,7 +46,16 @@ try {
         $stmt->bindParam(":unit_price", $garment["unit_price"]);
         $stmt->execute();
     }
-    echo json_encode(["success" => true, "message" => "Order added successfully"]);
+
+    // Create billing record
+    $stmt = $pdo->prepare("INSERT INTO billings (order_id, subtotal, total_amount, status) VALUES (:order_id, :subtotal, :total_amount, 'unpaid')");
+    $stmt->bindParam(":order_id", $orderId, PDO::PARAM_INT);
+    $stmt->bindParam(":subtotal", $orderAmount);
+    $stmt->bindParam(":total_amount", $orderAmount);
+    $stmt->execute();
+
+    echo json_encode(["success" => true, "message" => "Order added successfully", "order_id" => $orderId]);
+
 } catch (PDOException $e) {
     echo json_encode(["success" => false, "error" => $e->getMessage()]);
 }
