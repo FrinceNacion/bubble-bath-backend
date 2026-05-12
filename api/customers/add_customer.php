@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_once __DIR__ . '/../../middleware/authenticate.php';
 
 require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../config/sanitizer.php';
 
 $input = json_decode(file_get_contents("php://input"), true);
 
@@ -18,10 +19,15 @@ if (!$input) {
     exit();
 }
 
-$name = $input['name'] ?? null;
-$email = $input['email'] ?? null;
-$mobile = $input['mobile'] ?? null;
-$address = $input['address'] ?? null;
+$name = sanitize_input($input['name'] ?? null);
+$email = sanitize_input($input['email'] ?? null);
+$mobile = sanitize_input($input['mobile'] ?? null);
+$address = sanitize_input($input['address'] ?? null);
+
+if (!$name || !$mobile) {
+    echo json_encode(["success" => false, "error" => "Name and mobile are required"]);
+    exit();
+}
 
 $stmt = $pdo->prepare("INSERT INTO customers (name, email, contact_number, address) VALUES (:name, :email, :mobile, :address)");
 $stmt->bindParam(':name', $name);
