@@ -40,6 +40,7 @@ CREATE TABLE users (
 -- =========================
 CREATE TABLE orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
+    tracking_id VARCHAR(50) UNIQUE,
     customer_id INT,
     order_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     pickup_date DATETIME,
