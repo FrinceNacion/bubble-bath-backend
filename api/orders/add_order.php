@@ -29,7 +29,10 @@ if (!$customerId || !$dueDate || !$garments) {
 }
 
 try {
-    $stmt = $pdo->prepare("INSERT INTO orders (customer_id, pickup_date, order_amount) VALUES (:customer_id, :pickup_date, :order_amount)");
+    $trackingId = 'TRK-' . date('Y') . '-' . strtoupper(substr(uniqid(), -6));
+
+    $stmt = $pdo->prepare("INSERT INTO orders (tracking_id, customer_id, pickup_date, order_amount) VALUES (:tracking_id, :customer_id, :pickup_date, :order_amount)");
+    $stmt->bindParam(":tracking_id", $trackingId);
     $stmt->bindParam(":customer_id", $customerId, PDO::PARAM_INT);
     $stmt->bindParam(":pickup_date", $dueDate);
     $stmt->bindParam(":order_amount", $orderAmount);
@@ -54,7 +57,7 @@ try {
     $stmt->bindParam(":total_amount", $orderAmount);
     $stmt->execute();
 
-    echo json_encode(["success" => true, "message" => "Order added successfully", "order_id" => $orderId]);
+    echo json_encode(["success" => true, "message" => "Order added successfully", "order_id" => $orderId, "tracking_id" => $trackingId]);
 
 } catch (PDOException $e) {
     echo json_encode(["success" => false, "error" => $e->getMessage()]);
