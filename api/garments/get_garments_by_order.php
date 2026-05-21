@@ -25,7 +25,7 @@ if (!$orderId) {
     exit();
 }
 
-try{
+try {
     $stmt = $pdo->prepare("SELECT * FROM garments WHERE order_id = :order_id AND deleted_at IS NULL");
     $stmt->bindParam(":order_id", $orderId, PDO::PARAM_INT);
     $stmt->execute();

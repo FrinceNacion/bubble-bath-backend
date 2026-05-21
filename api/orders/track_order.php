@@ -33,7 +33,7 @@ try {
     ");
     $stmt->bindParam(":tracking_id", $trackingId);
     $stmt->execute();
-    
+
     $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$order) {
@@ -45,7 +45,7 @@ try {
     $garmentsStmt = $pdo->prepare("SELECT type, service, quantity FROM garments WHERE order_id = :order_id");
     $garmentsStmt->bindParam(":order_id", $order['order_id'], PDO::PARAM_INT);
     $garmentsStmt->execute();
-    
+
     $items = $garmentsStmt->fetchAll(PDO::FETCH_ASSOC);
 
     $responseData = [
