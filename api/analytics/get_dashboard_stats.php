@@ -46,7 +46,7 @@ try {
     $stmt = $pdo->prepare("SELECT SUM(amount_paid) as revenue FROM payments WHERE MONTH(payment_date) = MONTH(DATE_SUB(CURDATE(), INTERVAL 1 MONTH)) AND YEAR(payment_date) = YEAR(DATE_SUB(CURDATE(), INTERVAL 1 MONTH))");
     $stmt->execute();
     $prevMonthRevenue = $stmt->fetch(PDO::FETCH_ASSOC)['revenue'] ?? 0;
-    
+
     $revenueTrend = 0;
     if ($prevMonthRevenue > 0) {
         $revenueTrend = (($monthlyRevenue - $prevMonthRevenue) / $prevMonthRevenue) * 100;
@@ -55,12 +55,12 @@ try {
     echo json_encode([
         "success" => true,
         "data" => [
-            "today_revenue" => (float)$todayRevenue,
-            "monthly_revenue" => (float)$monthlyRevenue,
-            "total_orders" => (int)$totalOrders,
-            "pending_orders" => (int)$pendingOrders,
-            "completed_orders" => (int)$completedOrders,
-            "active_customers" => (int)$activeCustomers,
+            "today_revenue" => (float) $todayRevenue,
+            "monthly_revenue" => (float) $monthlyRevenue,
+            "total_orders" => (int) $totalOrders,
+            "pending_orders" => (int) $pendingOrders,
+            "completed_orders" => (int) $completedOrders,
+            "active_customers" => (int) $activeCustomers,
             "revenue_trend" => round($revenueTrend, 2)
         ]
     ]);
